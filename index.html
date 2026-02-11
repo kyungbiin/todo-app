@@ -1,41 +1,160 @@
 <!DOCTYPE html>
 <html lang="ko">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>My Tasks</title>
+    <title>나의 일정 - 캘린더 투두</title>
+    <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <!-- CSS -->
     <link rel="stylesheet" href="style.css">
+    <link rel="icon"
+        href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📅</text></svg>">
 </head>
+
 <body>
+    <div class="app-background"></div>
     <div class="app-container">
+        <!-- Header Section -->
         <header>
-            <h1>My Tasks</h1>
-            <p id="date-display"></p>
-        </header>
-        
-        <main>
-            <div class="input-group">
-                <input type="text" id="todo-input" placeholder="Add a new task..." autocomplete="off">
-                <button id="add-btn" aria-label="Add task">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M12 5V19M5 12H19" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <div class="header-top">
+                <div>
+                    <h1>나의 일정</h1>
+                    <p id="date-display" class="date-text"></p>
+                </div>
+                <button id="theme-toggle" class="icon-btn" aria-label="다크 모드 전환">
+                    <svg class="sun-icon" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                        xmlns="http://www.w3.org/2000/svg" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                    <svg class="moon-icon hidden" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                        xmlns="http://www.w3.org/2000/svg" stroke="currentColor" stroke-width="2">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
                     </svg>
                 </button>
             </div>
 
-            <div class="todo-list-container">
-                <ul id="todo-list">
-                    <!-- Tasks will be added here dynamically -->
-                </ul>
-                <div id="empty-state" class="hidden">
-                    <p>No tasks yet. Add one above!</p>
+            <!-- Calendar Wrapper -->
+            <div class="calendar-wrapper">
+                <div class="calendar-header">
+                    <button id="prev-month" class="icon-btn">‹</button>
+                    <h2 id="calendar-month-year">2024년 2월</h2>
+                    <button id="next-month" class="icon-btn">›</button>
+                </div>
+                <div class="calendar-grid-header">
+                    <div>일</div>
+                    <div>월</div>
+                    <div>화</div>
+                    <div>수</div>
+                    <div>목</div>
+                    <div>금</div>
+                    <div>토</div>
+                </div>
+                <div id="calendar-days" class="calendar-days">
+                    <!-- Days injected via JS -->
                 </div>
             </div>
+
+            <div class="progress-section">
+                <div class="progress-header">
+                    <span class="progress-label">오늘의 달성률</span>
+                    <span id="progress-text" class="progress-text">0/0</span>
+                </div>
+                <div class="progress-bar-container">
+                    <div id="progress-fill" class="progress-bar-fill" style="width: 0%"></div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Controls Section -->
+        <section class="controls-section">
+            <div class="search-wrapper">
+                <svg class="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                    stroke-width="2">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                </svg>
+                <input type="text" id="search-input" placeholder="일정 검색..." aria-label="일정 검색">
+            </div>
+
+            <div class="filter-sort-row">
+                <div class="select-wrapper">
+                    <select id="sort-select" aria-label="정렬">
+                        <option value="createdAt-desc">최신순</option>
+                        <option value="priority-desc">중요도순</option>
+                    </select>
+                </div>
+                <div class="tab-filters">
+                    <button class="filter-btn active" data-filter="all">전체</button>
+                    <button class="filter-btn" data-filter="active">진행중</button>
+                    <button class="filter-btn" data-filter="completed">완료</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Input Section -->
+        <section class="input-section">
+            <div class="input-main">
+                <input type="text" id="todo-input" placeholder="할 일을 입력하세요..." autocomplete="off">
+            </div>
+
+            <div class="input-options">
+                <div class="option-group">
+                    <select id="priority-select" aria-label="우선순위 선택">
+                        <option value="low">낮음</option>
+                        <option value="medium" selected>보통</option>
+                        <option value="high">높음</option>
+                    </select>
+
+                    <select id="category-select" aria-label="카테고리 선택">
+                        <option value="personal">개인</option>
+                        <option value="work">업무</option>
+                        <option value="study">공부</option>
+                        <option value="etc">기타</option>
+                    </select>
+                </div>
+
+                <button id="add-btn">추가</button>
+            </div>
+        </section>
+
+        <!-- List Section -->
+        <main>
+            <h3 id="selected-date-title" class="section-title">오늘의 일정</h3>
+            <ul id="todo-list" class="todo-list">
+                <!-- Tasks rendered here -->
+            </ul>
+
+            <div id="empty-state" class="empty-state hidden">
+                <div class="empty-illustration">📅</div>
+                <h3>일정이 없습니다</h3>
+                <p>새로운 할 일을 추가해보세요.</p>
+            </div>
         </main>
+
     </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast hidden">
+        <div class="toast-content">
+            <span id="toast-message">삭제되었습니다</span>
+            <button id="undo-btn">실행 취소</button>
+        </div>
+    </div>
+
     <script src="script.js"></script>
 </body>
+
 </html>
